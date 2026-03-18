@@ -1,4 +1,4 @@
-package com.example.demo.entity;
+package com.stu8317.demo1.entity;
 
 public class User {
     private Long id;

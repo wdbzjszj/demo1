@@ -1,6 +1,6 @@
-package com.example.demo.controller;
+package com.stu8317.demo1.controller;
 
-import com.example.demo.entity.User;
+import com.stu8317.demo1.entity.User;
 // 关键修复：替换成 Web 注解的正确包路径，删除 test 相关的导入
 import org.springframework.web.bind.annotation.*;
 
