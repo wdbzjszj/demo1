@@ -1,4 +1,4 @@
-package com.stu8317.demo1.config;
+package com.stu8317.demo1.intercepter;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
