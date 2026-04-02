@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: demo1
+  server:
+    port: 8080
+  datasource:
+    # PostgreSQL连接配置，和你的pgAdmin一致
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/lab_db
+    username: postgres
+    password: 123456
+
+# MyBatis-Plus配置
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true # 开启下划线转驼峰
+  mapper-locations: classpath:mapper/*.xml # 如无XML可省略

@@ -13,21 +13,21 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    // 1. 用户注册 - POST /api/users
+    // 注册
     @PostMapping
     public Result<String> register(@RequestBody UserDTO userDTO) {
         return userService.register(userDTO);
     }
 
-    // 2. 用户登录 - POST /api/users/login
+    // 登录
     @PostMapping("/login")
     public Result<String> login(@RequestBody UserDTO userDTO) {
         return userService.login(userDTO);
     }
 
-    // 3. 测试接口 - GET /api/users/{id}
+    // 查询用户（测试用）
     @GetMapping("/{id}")
-    public Result<String> getUser(@PathVariable("id") Long id) {
-        return Result.success("查询成功，正在返回 ID 为 " + id + " 的用户信息");
+    public Result<String> getUser(@PathVariable Long id) {
+        return Result.success("查询成功，ID：" + id);
     }
 }
