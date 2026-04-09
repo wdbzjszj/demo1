@@ -6,7 +6,7 @@ spring:
   datasource:
     # PostgreSQL连接配置，和你的pgAdmin一致
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/lab_db
+    url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
     password: 123456
 

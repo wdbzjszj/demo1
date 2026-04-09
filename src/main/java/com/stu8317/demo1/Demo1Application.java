@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @MapperScan("com.stu8317.demo1.mapper") // 扫描Mapper接口
 public class Demo1Application {
     public static void main(String[] args) {
+
         SpringApplication.run(Demo1Application.class, args);
     }
 }

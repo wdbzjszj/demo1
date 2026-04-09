@@ -6,6 +6,9 @@ import com.stu8317.demo1.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * 用户接口控制器
+ */
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -13,21 +16,27 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    // 注册
+    /**
+     * 1. 用户注册接口
+     */
     @PostMapping
     public Result<String> register(@RequestBody UserDTO userDTO) {
         return userService.register(userDTO);
     }
 
-    // 登录
+    /**
+     * 2. 用户登录接口
+     */
     @PostMapping("/login")
     public Result<String> login(@RequestBody UserDTO userDTO) {
         return userService.login(userDTO);
     }
 
-    // 查询用户（测试用）
+    /**
+     * 3. 根据ID查询用户接口
+     */
     @GetMapping("/{id}")
-    public Result<String> getUser(@PathVariable Long id) {
-        return Result.success("查询成功，ID：" + id);
+    public Result<String> getUser(@PathVariable("id") Long id) {
+        return userService.getUserById(id);
     }
 }

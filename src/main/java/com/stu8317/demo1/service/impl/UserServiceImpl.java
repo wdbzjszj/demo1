@@ -10,49 +10,72 @@ import com.stu8317.demo1.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * 用户服务实现类
+ */
 @Service
 public class UserServiceImpl implements UserService {
 
-    // 注入真实的Mapper，替换原来的Map模拟
     @Autowired
     private UserMapper userMapper;
 
+    /**
+     * 用户注册
+     */
     @Override
     public Result<String> register(UserDTO userDTO) {
-        // 1. 校验用户名是否已存在（真实数据库查询）
-        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(User::getUsername, userDTO.getUsername());
-        User existUser = userMapper.selectOne(wrapper);
+        // 1. 查询用户名是否已存在
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(User::getUsername, userDTO.getUsername());
+        User dbUser = userMapper.selectOne(queryWrapper);
 
-        if (existUser != null) {
+        if (dbUser != null) {
             return Result.error(ResultCode.USER_HAS_EXISTED);
         }
 
-        // 2. 构造User实体，插入数据库
+        // 2. 组装实体对象
         User user = new User();
         user.setUsername(userDTO.getUsername());
-        user.setPassword(userDTO.getPassword()); // 生产环境请加密，作业直接明文
+        user.setPassword(userDTO.getPassword());
+
+        // 3. 插入数据库
         userMapper.insert(user);
 
-        return Result.success("注册成功");
+        return Result.success("注册成功！");
     }
 
+    /**
+     * 用户登录
+     */
     @Override
     public Result<String> login(UserDTO userDTO) {
-        // 1. 校验用户是否存在
-        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(User::getUsername, userDTO.getUsername());
-        User user = userMapper.selectOne(wrapper);
+        // 1. 根据用户名查询数据库
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(User::getUsername, userDTO.getUsername());
+        User dbUser = userMapper.selectOne(queryWrapper);
 
-        if (user == null) {
+        // 2. 校验用户是否存在
+        if (dbUser == null) {
             return Result.error(ResultCode.USER_NOT_EXIST);
         }
 
-        // 2. 校验密码
-        if (!user.getPassword().equals(userDTO.getPassword())) {
+        // 3. 校验密码是否正确
+        if (!dbUser.getPassword().equals(userDTO.getPassword())) {
             return Result.error(ResultCode.PASSWORD_ERROR);
         }
 
-        return Result.success("登录成功");
+        return Result.success("登录成功！");
+    }
+
+    /**
+     * 根据ID查询用户
+     */
+    @Override
+    public Result<String> getUserById(Long id) {
+        User user = userMapper.selectById(id);
+        if (user == null) {
+            return Result.error("用户不存在");
+        }
+        return Result.success("查询成功，用户信息：" + user.toString());
     }
 }
