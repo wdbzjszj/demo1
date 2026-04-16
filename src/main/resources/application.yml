@@ -1,17 +1,23 @@
 spring:
   application:
     name: demo1
+  # 服务器端口
   server:
     port: 8080
+  # 数据库配置
   datasource:
-    # PostgreSQL连接配置，和你的pgAdmin一致
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
     password: 123456
+  # 任务7：Redis 配置
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 0
 
-# MyBatis-Plus配置
+# MyBatis-Plus 配置
 mybatis-plus:
   configuration:
-    map-underscore-to-camel-case: true # 开启下划线转驼峰
-  mapper-locations: classpath:mapper/*.xml # 如无XML可省略
+    map-underscore-to-camel-case: true  # 下划线转驼峰（必须开启）
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl  # 打印SQL（方便调试）
