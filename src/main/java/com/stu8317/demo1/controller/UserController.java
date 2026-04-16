@@ -1,7 +1,9 @@
 package com.stu8317.demo1.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.stu8317.demo1.common.Result;
 import com.stu8317.demo1.dto.UserDTO;
+import com.stu8317.demo1.entity.User;
 import com.stu8317.demo1.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -38,5 +40,17 @@ public class UserController {
     @GetMapping("/{id}")
     public Result<String> getUser(@PathVariable("id") Long id) {
         return userService.getUserById(id);
+    }
+
+    // ===================== 【新增：分页查询接口（作业必须要的）】=====================
+    /**
+     * 4. 分页查询用户列表
+     */
+    @GetMapping("/page")
+    public Result<Page<User>> getUserPage(
+            @RequestParam(defaultValue = "1") Integer pageNum,
+            @RequestParam(defaultValue = "5") Integer pageSize
+    ) {
+        return userService.getUserPage(pageNum, pageSize);
     }
 }
