@@ -20,4 +20,7 @@ spring:
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true  # 下划线转驼峰（必须开启）
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl  # 打印SQL（方便调试）
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl  # 打印SQL
+  global-config:
+    db-config:
+      id-type: auto  # 适配PostgreSQL自增主键（BIGSERIAL）
