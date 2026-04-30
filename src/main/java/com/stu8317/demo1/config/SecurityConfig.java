@@ -1,5 +1,7 @@
 package com.stu8317.demo1.config;
 
+import com.stu8317.demo1.security.JwtAuthenticationFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -7,34 +9,37 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // 开启 CORS 配置
+                // 开启CORS
                 .cors(cors -> cors.configure(http))
-                // 关闭 CSRF（前后端分离场景）
+                // 关闭CSRF
                 .csrf(csrf -> csrf.disable())
-                // 配置无状态会话（不使用 Session）
+                // 无状态会话
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                // 接口权限规则配置
+                // 接口权限配置
                 .authorizeHttpRequests(auth -> auth
-                        // 放行注册接口：POST /api/users
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
-                        // 放行登录接口：POST /api/users/login
                         .requestMatchers(HttpMethod.POST, "/api/users/login").permitAll()
-                        // 其他所有接口都需要认证
                         .anyRequest().authenticated()
                 )
-                // 关闭表单登录和 HTTP Basic 认证
+                // 关闭表单登录和HTTP Basic认证
                 .formLogin(form -> form.disable())
-                .httpBasic(basic -> basic.disable());
+                .httpBasic(basic -> basic.disable())
+                // 添加JWT过滤器到用户名密码过滤器之前
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

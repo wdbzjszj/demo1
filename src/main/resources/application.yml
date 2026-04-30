@@ -1,16 +1,10 @@
 spring:
-  application:
-    name: demo1
-  # 服务器端口
-  server:
-    port: 8080
-  # 数据库配置
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
     password: 123456
-  # 任务7：Redis 配置
+  # 修正：Redis配置要缩进在spring下
   redis:
     host: 127.0.0.1
     port: 6379
@@ -19,8 +13,14 @@ spring:
 # MyBatis-Plus 配置
 mybatis-plus:
   configuration:
-    map-underscore-to-camel-case: true  # 下划线转驼峰（必须开启）
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl  # 打印SQL
+    map-underscore-to-camel-case: true # 下划线转驼峰（必须开启）
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 打印SQL
   global-config:
     db-config:
-      id-type: auto  # 适配PostgreSQL自增主键（BIGSERIAL）
+      id-type: auto # 适配PostgreSQL自增主键（BIGSERIAL）
+
+# 新增：JWT 配置（放在文件最外层，和spring同级）
+security:
+  jwt:
+    secret: demo-jwt-secret-key-for-spring-security-2026
+    expiration-millis: 7200000 # 2小时，单位毫秒

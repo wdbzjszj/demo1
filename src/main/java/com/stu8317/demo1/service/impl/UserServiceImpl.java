@@ -11,10 +11,12 @@ import com.stu8317.demo1.entity.User;
 import com.stu8317.demo1.entity.UserInfo;
 import com.stu8317.demo1.mapper.UserMapper;
 import com.stu8317.demo1.mapper.UserInfoMapper;
+import com.stu8317.demo1.security.JwtUtil;
 import com.stu8317.demo1.service.UserService;
 import com.stu8317.demo1.vo.UserDetailVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,9 +34,15 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private StringRedisTemplate redisTemplate;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtUtil jwtUtil; // 注入JwtUtil
+
     private static final String CACHE_KEY_PREFIX = "user:detail:";
 
-    // ===================== 原有方法（保留） =====================
+    // ===================== 原有方法（保留，仅修改login） =====================
     @Override
     public Result<String> register(UserDTO userDTO) {
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
@@ -45,7 +53,7 @@ public class UserServiceImpl implements UserService {
         }
         User user = new User();
         user.setUsername(userDTO.getUsername());
-        user.setPassword(userDTO.getPassword());
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         userMapper.insert(user);
         return Result.success("注册成功！");
     }
@@ -58,12 +66,15 @@ public class UserServiceImpl implements UserService {
         if (dbUser == null) {
             return Result.error(ResultCode.USER_NOT_EXIST);
         }
-        if (!dbUser.getPassword().equals(userDTO.getPassword())) {
+        if (!passwordEncoder.matches(userDTO.getPassword(), dbUser.getPassword())) {
             return Result.error(ResultCode.PASSWORD_ERROR);
         }
-        return Result.success("登录成功！");
+        // 登录成功，生成JWT并返回
+        String jwt = jwtUtil.generateToken(userDTO.getUsername());
+        return Result.success(jwt);
     }
 
+    // 其他方法（getUserById、getUserPage等）完全保留，无需修改
     @Override
     public Result<String> getUserById(Long id) {
         User user = userMapper.selectById(id);
@@ -80,12 +91,9 @@ public class UserServiceImpl implements UserService {
         return Result.success(page);
     }
 
-    // ===================== 任务7新增方法 =====================
     @Override
     public Result<UserDetailVO> getUserDetail(Long userId) {
         String key = CACHE_KEY_PREFIX + userId;
-
-        // 1. 先查缓存
         String json = redisTemplate.opsForValue().get(key);
         if (StrUtil.isNotBlank(json)) {
             try {
@@ -95,21 +103,16 @@ public class UserServiceImpl implements UserService {
                 redisTemplate.delete(key);
             }
         }
-
-        // 2. 查数据库
         UserDetailVO detail = userInfoMapper.getUserDetail(userId);
         if (detail == null) {
             return Result.error(ResultCode.USER_NOT_EXIST);
         }
-
-        // 3. 写缓存
         redisTemplate.opsForValue().set(
                 key,
                 JSONUtil.toJsonStr(detail),
                 10,
                 TimeUnit.MINUTES
         );
-
         return Result.success(detail);
     }
 
@@ -119,12 +122,9 @@ public class UserServiceImpl implements UserService {
         if (userInfo == null || userInfo.getUserId() == null) {
             return Result.error("参数错误");
         }
-
         userInfoMapper.updateById(userInfo);
-        // 清除缓存
         String key = CACHE_KEY_PREFIX + userInfo.getUserId();
         redisTemplate.delete(key);
-
         return Result.success("更新成功");
     }
 
@@ -134,14 +134,10 @@ public class UserServiceImpl implements UserService {
         if (userId == null) {
             return Result.error("用户ID不能为空");
         }
-
         userMapper.deleteById(userId);
         userInfoMapper.delete(new LambdaQueryWrapper<UserInfo>().eq(UserInfo::getUserId, userId));
-
-        // 清除缓存
         String key = CACHE_KEY_PREFIX + userId;
         redisTemplate.delete(key);
-
         return Result.success("删除成功");
     }
 }
