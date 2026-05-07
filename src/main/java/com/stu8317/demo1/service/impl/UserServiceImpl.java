@@ -19,6 +19,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.concurrent.TimeUnit;
 
@@ -139,5 +140,24 @@ public class UserServiceImpl implements UserService {
         String key = CACHE_KEY_PREFIX + userId;
         redisTemplate.delete(key);
         return Result.success("删除成功");
+    }
+
+    @Override
+    public Result<User> getCurrentUserInfo() {
+        // 1. 从 SecurityContext 获取当前登录用户
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        // 2. 根据用户名查询用户
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(User::getUsername, username);
+        User user = userMapper.selectOne(queryWrapper);
+
+        if (user == null) {
+            return Result.error("用户不存在");
+        }
+
+        // 3. 返回用户信息（可以隐藏密码字段）
+        user.setPassword(null);
+        return Result.success(user);
     }
 }

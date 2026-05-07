@@ -18,6 +18,15 @@ public class UserController {
     private UserService userService;
 
     // ===================== 原有接口（保留） =====================
+
+    /**
+     * 获取当前登录用户信息（从JWT中读取）
+     */
+    @GetMapping("/info")
+    public Result<User> getCurrentUserInfo() {
+        return userService.getCurrentUserInfo();
+    }
+
     @PostMapping
     public Result<String> register(@RequestBody UserDTO userDTO) {
         return userService.register(userDTO);
@@ -69,4 +78,5 @@ public class UserController {
     public Result<String> deleteUser(@PathVariable("id") Long userId) {
         return userService.deleteUser(userId);
     }
+
 }

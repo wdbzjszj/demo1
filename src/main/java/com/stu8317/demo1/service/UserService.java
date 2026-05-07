@@ -40,4 +40,7 @@ public interface UserService {
 
     // 新增：删除用户（带缓存清除）
     Result<String> deleteUser(Long userId);
+
+    Result<User> getCurrentUserInfo();
+
 }
