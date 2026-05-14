@@ -4,23 +4,31 @@ spring:
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
     password: 123456
-  # 修正：Redis配置要缩进在spring下
-  redis:
-    host: 127.0.0.1
-    port: 6379
-    database: 0
+  # Redis 配置
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      database: 0
+  # AI 大模型配置（百炼通义千问）
+  ai:
+    dashscope:
+      api-key: ${AI_DASHSCOPE_API_KEY}
+      chat:
+        options:
+          model: qwen-turbo
 
 # MyBatis-Plus 配置
 mybatis-plus:
   configuration:
-    map-underscore-to-camel-case: true # 下划线转驼峰（必须开启）
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 打印SQL
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
     db-config:
-      id-type: auto # 适配PostgreSQL自增主键（BIGSERIAL）
+      id-type: auto
 
-# 新增：JWT 配置（放在文件最外层，和spring同级）
+# JWT 配置
 security:
   jwt:
     secret: demo-jwt-secret-key-for-spring-security-2026
-    expiration-millis: 7200000 # 2小时，单位毫秒
+    expiration-millis: 7200000
